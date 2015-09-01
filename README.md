@@ -6,7 +6,11 @@ Chrome DevTools Extension Panel for viewing decrypted SAML messages in its own c
 This is for Chrome only (tested on OSX 10.10.5 and Chrome 44.0.2403.157)
 
 ## Install
-To install, go to chrome://extensions in your browser, Enable Developer Mode and the click on "Load unpacked Extension..." or drag in the .crx
+To install, go to chrome://extensions in your browser, Enable Developer Mode and the click on "Load unpacked Extension..." 
+
+OR
+
+https://chrome.google.com/webstore/detail/saml-chrome-panel/paijfdbeoenhembfhkhllainmocckace
 
 ## Use
 To view the messages, you'll need to load developer tools and head to the SAML Chrome tab. Then go to a page which initiates a SAML transaction and load it. You'll then notice only SAML requests will appear in the left hand column and when selected, the SAML message will be decrypted and shown on the right hand side. Some additional information is available (such as Request information and Cookie information).
