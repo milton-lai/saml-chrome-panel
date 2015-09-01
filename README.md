@@ -1,6 +1,8 @@
 # saml-chrome-panel
 Chrome DevTools Extension Panel for viewing decrypted SAML messages in its own custom tab.
 
+![alt tag](https://raw.githubusercontent.com/milton-lai/saml-chrome-panel/master/SAMLforChromeLogo.png)
+
 This is for Chrome only (tested on OSX 10.10.5 and Chrome 44.0.2403.157)
 
 ## Install
