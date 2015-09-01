@@ -38,7 +38,7 @@ SAMLChrome.controller('PanelController', function PanelController($scope, $http,
     $scope.activeHeaders = [];
     $scope.activePostData = [];
     $scope.activeRequest = [];
-    $scope.activeSaml = [];
+    $scope.activeSaml = null;
     $scope.activeRequestURL = "There are no SAML messages to display";
 
     $scope.showIncomingRequests = true;
@@ -170,8 +170,8 @@ SAMLChrome.controller('PanelController', function PanelController($scope, $http,
         $scope.activeHeaders = [];
         $scope.activePostData = [];
         $scope.activeRequest = [];
-        $scope.activeSaml = [];
-        $scope.activeRequestURL = [];
+        $scope.activeSaml = null;
+        $scope.activeRequestURL = "There are no SAML messages to display";
 
         $scope.showIncomingRequests = true;
     };
@@ -225,12 +225,24 @@ SAMLChrome.controller('PanelController', function PanelController($scope, $http,
             inchar: " ", // indent character
             insize: 3 // number of indent characters per indent
         }
+        if ($scope.activeSaml != null) {
+           var pd = prettydiff(options); // returns and array: [beautified, report]
 
-        var pd = prettydiff(options); // returns and array: [beautified, report]
+            var pretty = pd[0];
+            document.getElementById("tab-saml-codemirror").innerHTML = "";
+            var myCodeMirror = CodeMirror(document.getElementById("tab-saml-codemirror"), {
+              value: pretty,
+              mode:  "xml",
+              lineNumbers: true
+            });
 
-        var pretty = pd[0];
-
-        document.getElementById("tab-saml").innerText = pretty;
+            document.getElementById("tab-saml-text-heading").style.visibility = "visible";
+            document.getElementById("tab-saml-text").innerText = $scope.activeSaml;
+        } else {
+            document.getElementById("tab-saml-codemirror").innerHTML = "";
+            document.getElementById("tab-saml-text-heading").style.visibility = "hidden";
+            document.getElementById("tab-saml-text").innerText = "";
+        }
     });
 
 });

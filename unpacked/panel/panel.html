@@ -3,6 +3,7 @@
     <link rel="stylesheet" type="text/css" href="vendor/assets/stylesheets/pretty-jason.css">
     <link rel="stylesheet" type="text/css" href="vendor/assets/stylesheets/jquery.resizableColumns.css">
     <link rel="stylesheet" type="text/css" href="vendor/assets/stylesheets/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="vendor/assets/stylesheets/codemirror.css">
     <link rel="stylesheet" type="text/css" href="assets/stylesheets/panel.css">
     <script src="vendor/assets/javascripts/jquery-2.0.2.min.js"></script>
     <script src="vendor/assets/javascripts/jquery-ui-1.10.3.custom.min.js"></script>
@@ -15,9 +16,12 @@
     <script src="vendor/assets/javascripts/jquery.resizableColumns.min.js"></script>
     <script src="vendor/assets/javascripts/prettydiff.min.js"></script>
     <script src="vendor/assets/javascripts/rawinflate.js"></script>
+    <script src="vendor/assets/javascripts/codemirror.js"></script>
+    <script src="vendor/assets/javascripts/codemirror-xml.js"></script>
     <script src="assets/javascripts/app.js"></script>
     <script src="assets/javascripts/panel.js"></script>
     <script src="assets/javascripts/toolbar.js"></script>
+
 </head>
 <body>
 <div class="split-view" ng-controller='PanelController' ng-init="init('chrome-extension')">
@@ -82,7 +86,12 @@
             <div class="tabbed-pane-content data-grid data-grid-details">
 
                 <div id="tab-saml">
+                    <div id="tab-saml-codemirror">
+                    </div>
+                    <h4 id="tab-saml-text-heading" style='visibility:hidden'>&nbsp;&nbsp;Unformatted SAML</h4>
+                    <div id="tab-saml-text">
                     {{activeSaml}}
+                    </div>
                 </div>
 
 
