@@ -4,7 +4,7 @@
 
 chrome.devtools.panels.create(
     'SAML Chrome',
-    null, // No icon path
+    'panel/assets/images/SAMLforChromeLogoSquare.png', // No icon path
     'panel/panel.html',
     null // no callback needed
 );
