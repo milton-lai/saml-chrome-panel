@@ -72,16 +72,15 @@ SAMLChrome.controller('PanelController', function PanelController($scope, $http,
         var response_status = har_entry.response.status;
         var saml_request_string = "SAMLRequest=";
         var saml_response_string = "SAMLResponse=";
-        var relay_state_string = "RelayState=";
 
         var index_of_saml_request_string = request_url.indexOf(saml_request_string);
         if (index_of_saml_request_string > -1) {
             Console.log("SAML Request Method: " + request_method);
             Console.log("SAML Request URL: " + request_url);
-            var index_of_relay_state_string = request_url.indexOf(relay_state_string);
+            var index_of_next_param = request_url.indexOf("&", index_of_saml_request_string);
 
             //assumes that the GET request is http(s)://host/sso/idp?SAMLRequest=xxxxx&RelayState=yyyy
-            var saml_message = request_url.substr(index_of_saml_request_string + saml_request_string.length, index_of_relay_state_string - 1 - (index_of_saml_request_string + saml_request_string.length));
+            var saml_message = request_url.substr(index_of_saml_request_string + saml_request_string.length, index_of_next_param - (index_of_saml_request_string + saml_request_string.length));
             //requires inflating
             var decoded_saml_message = RawDeflate.inflate(window.atob(unescape(saml_message)));
             $scope.addRequest(har_entry, request_method, request_url, response_status, decoded_saml_message);
@@ -96,21 +95,21 @@ SAMLChrome.controller('PanelController', function PanelController($scope, $http,
 
         if (har_post_data != null) {
             if (har_post_data.slice(0, saml_request_string.length) == saml_request_string) {
-                var decoded_saml_message = $scope.getDecodedSamlMessageFromPostData("Request", request_method, request_url, har_post_data, saml_request_string, response_status, har_entry, relay_state_string);
+                var decoded_saml_message = $scope.getDecodedSamlMessageFromPostData("Request", request_method, request_url, har_post_data, saml_request_string, response_status, har_entry);
                 Console.log("SAML Request Data: " + decoded_saml_message);
 
             } else if (har_post_data.slice(0, saml_response_string.length) == saml_response_string) {
-                var decoded_saml_message = $scope.getDecodedSamlMessageFromPostData("Response", request_method, request_url, har_post_data, saml_response_string, response_status, har_entry, relay_state_string);
+                var decoded_saml_message = $scope.getDecodedSamlMessageFromPostData("Response", request_method, request_url, har_post_data, saml_response_string, response_status, har_entry);
                 Console.log("SAML Response Data: " + decoded_saml_message);
             }
         }
     };
 
-    $scope.getDecodedSamlMessageFromPostData = function(request_response_string, request_method, request_url, har_post_data, saml_string, response_status, har_entry, relay_state_string) {
+    $scope.getDecodedSamlMessageFromPostData = function(request_response_string, request_method, request_url, har_post_data, saml_string, response_status, har_entry) {
         var saml_message = har_post_data.substr(saml_string.length, har_post_data.length - saml_string.length);
-        var index_of_relay_state_string = saml_message.indexOf(relay_state_string);
-        if (index_of_relay_state_string > -1) {
-            saml_message = saml_message.substr(0, index_of_relay_state_string - 1);
+        var index_of_next_param = saml_message.indexOf("&", 0);
+        if (index_of_next_param > -1) {
+            saml_message = saml_message.substr(0, index_of_next_param);
         }
 
         //using the window.atob base64 decoding method as it seems to work pretty well
