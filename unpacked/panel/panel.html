@@ -1,23 +1,19 @@
 <html ng-app="SAMLChrome" ng-csp="">
 <head>
-    <link rel="stylesheet" type="text/css" href="vendor/assets/stylesheets/pretty-jason.css">
     <link rel="stylesheet" type="text/css" href="vendor/assets/stylesheets/jquery.resizableColumns.css">
     <link rel="stylesheet" type="text/css" href="vendor/assets/stylesheets/font-awesome.min.css">
     <link rel="stylesheet" type="text/css" href="vendor/assets/stylesheets/codemirror.css">
     <link rel="stylesheet" type="text/css" href="assets/stylesheets/panel.css">
     <script src="vendor/assets/javascripts/jquery-2.0.2.min.js"></script>
     <script src="vendor/assets/javascripts/jquery-ui-1.10.3.custom.min.js"></script>
-    <script src="vendor/assets/javascripts/stupidtable.min.js"></script>
     <script src="vendor/assets/javascripts/sugar-1.3.9.min.js"></script>
     <script src="vendor/assets/javascripts/URI.min.js"></script>
     <script src="vendor/assets/javascripts/keymaster.min.js"></script>
     <script src="vendor/assets/javascripts/angular.min.js"></script>
-    <script src="vendor/assets/javascripts/pretty-jason.js"></script>
     <script src="vendor/assets/javascripts/jquery.resizableColumns.min.js"></script>
     <script src="vendor/assets/javascripts/prettydiff.min.js"></script>
     <script src="vendor/assets/javascripts/rawinflate.js"></script>
-    <script src="vendor/assets/javascripts/codemirror.js"></script>
-    <script src="vendor/assets/javascripts/codemirror-xml.js"></script>
+    <script src="vendor/assets/javascripts/codemirror-compressed.js"></script>
     <script src="assets/javascripts/app.js"></script>
     <script src="assets/javascripts/panel.js"></script>
     <script src="assets/javascripts/toolbar.js"></script>
@@ -32,7 +28,6 @@
                 <tr>
                     <th class='request'>
                         Path<br>
-                        <small>Request</small>
                     </th>
                     <th class='method'>Method</th>
                     <th class='status'>Status</th>
@@ -46,8 +41,8 @@
                         <td class='method'></td>
                         <td class='status'></td>
                     </tr>
-                    <tr ng-repeat="request in requests | orderBy:'id'" ng-click="setActive(request.id)" ng-class="getClass(request.id)" scroll-to-new>
-                        <td class='request' title="{{request.request_url}}">{{request.request_url}}<br/></td>
+                    <tr ng-repeat="request in showSamlRequests | orderBy:'id'" ng-click="setActive(request.id)" ng-class="getClass(request.id)" scroll-to-new>
+                        <td class='request' title="{{request.request_url}}">{{request.request_url}}<br/><small>{{isSaml(request.id)}}</small></td>
                         <td class='method' title="{{request.request_method}}">{{request.request_method}}</td>
                         <td class='status' title="{{request.response_status}}">{{request.response_status}}</td>
                     </tr>
@@ -67,14 +62,14 @@
             <div class="tabbed-pane-header">
                 <div class="tabbed-pane-header-contents">
                     <ul class="tabbed-pane-header-tabs">
-                        <li class="tabbed-pane-header-tab">
-                            <a href="#tab-saml" class="tabbed-pane-header-tab-title">SAML</a>
+                        <li class="tabbed-pane-header-tab" ng-show="activeSaml.length">
+                            <a href="#tab-saml" class="tabbed-pane-header-tab-title" ng-click="displaySaml()">SAML</a>
                         </li>
                         <li class="tabbed-pane-header-tab">
                             <a href="#tab-request" class="tabbed-pane-header-tab-title">Request</a>
                         </li>
-                        <li class="tabbed-pane-header-tab" ng-show="activeCookies.length">
-                            <a href="#tab-cookies" class="tabbed-pane-header-tab-title">Cookies</a>
+                        <li class="tabbed-pane-header-tab">
+                            <a href="#tab-response" class="tabbed-pane-header-tab-title">Response</a>
                         </li>
                     </ul>
                 </div>
@@ -94,8 +89,21 @@
                     </div>
                 </div>
 
-
                 <div id="tab-request">
+                    <table id="request-data" ng-show="activeRequest.length">
+                        <thead>
+                        <tr>
+                            <th colspan="2">Request Data</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="param in activeRequest">
+                            <td class="key">{{param.name}}</td>
+                            <td class="value"><pretty-print data="param.value"/></td>
+                        </tr>
+                        </tbody>
+                    </table>
+
                     <table id="headers" ng-show="activeHeaders.length">
                         <thead>
                         <tr>
@@ -113,7 +121,7 @@
                     <table id="postData" ng-show="activePostData.length">
                         <thead>
                         <tr>
-                            <th colspan="2">POST parameters</th>
+                            <th colspan="2">Request POST Data</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -123,13 +131,11 @@
                         </tr>
                         </tbody>
                     </table>
-                </div>
 
-                <div id="tab-cookies">
-                    <table id="cookies">
+                    <table id="request-cookies" ng-show="activeResponseCookies.length">
                         <thead>
                         <tr>
-                            <th colspan="2">Cookies</th>
+                            <th colspan="2">Request Cookies</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -141,6 +147,48 @@
                     </table>
                 </div>
 
+                <div id="tab-response">
+                    <table id="response-data" ng-show="activeResponseData.length">
+                        <thead>
+                        <tr>
+                            <th colspan="2">Response Data</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="param in activeResponseData">
+                            <td class="key">{{param.name}}</td>
+                            <td class="value"><pretty-print data="param.value"/></td>
+                        </tr>
+                        </tbody>
+                    </table>
+
+                    <table id="response-headers" ng-show="activeResponseHeaders.length">
+                        <thead>
+                        <tr>
+                            <th colspan="2">Response Headers</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="param in activeResponseHeaders">
+                            <td class="key">{{param.name}}</td>
+                            <td class="value"><pretty-print data="param.value"/></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <table id="response-cookies" ng-show="activeResponseCookies.length">
+                        <thead>
+                        <tr>
+                            <th colspan="2">Response Cookies</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="param in activeResponseCookies">
+                            <td class="key">{{param.name}}</td>
+                            <td><pretty-print data="param.value"/></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
 
             </div>
         </div>

@@ -33,11 +33,16 @@ SAMLChrome.controller('PanelController', function PanelController($scope, $http,
     $scope.uniqueid = 1000000;
     $scope.activeId = null;
     $scope.requests = {};
+    $scope.showSamlRequests = {};
+    $scope.showAll = true;
 
     $scope.activeCookies = [];
     $scope.activeHeaders = [];
     $scope.activePostData = [];
     $scope.activeRequest = [];
+    $scope.activeResponseData = [];
+    $scope.activeResponseCookies = [];
+    $scope.activeResponseHeaders = [];
     $scope.activeSaml = null;
     $scope.activeRequestURL = "There are no SAML messages to display";
 
@@ -72,6 +77,7 @@ SAMLChrome.controller('PanelController', function PanelController($scope, $http,
         var response_status = har_entry.response.status;
         var saml_request_string = "SAMLRequest=";
         var saml_response_string = "SAMLResponse=";
+        var found_saml = false;
 
         var index_of_saml_request_string = request_url.indexOf(saml_request_string);
         if (index_of_saml_request_string > -1) {
@@ -85,7 +91,7 @@ SAMLChrome.controller('PanelController', function PanelController($scope, $http,
             var decoded_saml_message = RawDeflate.inflate(window.atob(unescape(saml_message)));
             $scope.addRequest(har_entry, request_method, request_url, response_status, decoded_saml_message);
             Console.log("SAML Request Data: " + decoded_saml_message);
-
+            found_saml = true;
         }
 
         var har_post_data = null;
@@ -97,11 +103,16 @@ SAMLChrome.controller('PanelController', function PanelController($scope, $http,
             if (har_post_data.slice(0, saml_request_string.length) == saml_request_string) {
                 var decoded_saml_message = $scope.getDecodedSamlMessageFromPostData("Request", request_method, request_url, har_post_data, saml_request_string, response_status, har_entry);
                 Console.log("SAML Request Data: " + decoded_saml_message);
-
+                found_saml = true;
             } else if (har_post_data.slice(0, saml_response_string.length) == saml_response_string) {
                 var decoded_saml_message = $scope.getDecodedSamlMessageFromPostData("Response", request_method, request_url, har_post_data, saml_response_string, response_status, har_entry);
                 Console.log("SAML Response Data: " + decoded_saml_message);
+                found_saml = true;
             }
+        }
+
+        if (found_saml === false) {
+            $scope.addRequest(har_entry, request_method, request_url, response_status, null);
         }
     };
 
@@ -113,8 +124,6 @@ SAMLChrome.controller('PanelController', function PanelController($scope, $http,
         }
 
         //using the window.atob base64 decoding method as it seems to work pretty well
-                Console.log("SAML har_post_data Data: " + har_post_data);
-                Console.log("SAML Response Data: " + saml_message);
         var decoded_saml_message = window.atob(unescape(saml_message));
         $scope.addRequest(har_entry, request_method, request_url, response_status, decoded_saml_message);
 
@@ -122,6 +131,12 @@ SAMLChrome.controller('PanelController', function PanelController($scope, $http,
     };
 
     $scope.createToolbar = function() {
+        toolbar.createButton('tasks', 'Toggle Traffic', function() {
+            $scope.$apply(function() {
+                $scope.showAll = !$scope.showAll;
+                $scope.showTraffic();
+            });
+        });
         toolbar.createButton('ban', 'Clear', function() {
             $scope.$apply(function() {
                 $scope.clear();
@@ -137,16 +152,27 @@ SAMLChrome.controller('PanelController', function PanelController($scope, $http,
             $scope.uniqueid = $scope.uniqueid + 1;
 
             if (data.request != null) {
+                data["request_data"] = $scope.createKeypairs(data.request);
                 if (data.request.cookies != null) {
-                    data.cookies = $scope.createKeypairs(data.request.cookies);
+                    data.cookies = $scope.createKeypairsDeep(data.request.cookies);
                 }
                 if (data.request.headers != null) {
-                    data.headers = $scope.createKeypairs(data.request.headers);
+                    data.headers = $scope.createKeypairsDeep(data.request.headers);
                 }
                 if (data.request.postData != null) {
-                    data.postData = $scope.createKeypairs(data.request.postData.params);
+                    data.postData = $scope.createKeypairsDeep(data.request.postData.params);
                 }
             }
+            if (data.response != null) {
+                data["response_data"] = $scope.createKeypairs(data.response);
+                if (data.response.cookies != null) {
+                    data["response_cookies"] = $scope.createKeypairsDeep(data.response.cookies);
+                }
+                if (data.response.headers != null) {
+                   data["response_headers"] = $scope.createKeypairsDeep(data.response.headers);
+                }
+            }
+
             data["request_method"] = request_method;
             data["request_url"] = request_url;
             data["response_status"] = response_status;
@@ -154,6 +180,9 @@ SAMLChrome.controller('PanelController', function PanelController($scope, $http,
             data["saml"] = decoded_saml_message;
 
             $scope.requests[requestId] = data;
+            if (decoded_saml_message != null || $scope.showAll === true) {
+                $scope.showSamlRequests[requestId] = data;
+            }
 
             if ($scope.showIncomingRequests) {
                 $scope.setActive(requestId);
@@ -164,11 +193,16 @@ SAMLChrome.controller('PanelController', function PanelController($scope, $http,
     $scope.clear = function() {
         $scope.requests = {};
         $scope.activeId = null;
+        $scope.showSamlRequests = {};
+        $scope.showAll = true;
 
         $scope.activeCookies = [];
         $scope.activeHeaders = [];
         $scope.activePostData = [];
         $scope.activeRequest = [];
+        $scope.activeResponseData = [];
+        $scope.activeResponseCookies = [];
+        $scope.activeResponseHeaders = [];
         $scope.activeSaml = null;
         $scope.activeRequestURL = "There are no SAML messages to display";
 
@@ -181,13 +215,20 @@ SAMLChrome.controller('PanelController', function PanelController($scope, $http,
         $scope.activeCookies = $scope.requests[requestId].cookies;
         $scope.activeHeaders = $scope.requests[requestId].headers;
         $scope.activePostData = $scope.requests[requestId].postData;
-        $scope.activeRequest = $scope.requests[requestId];
+        $scope.activeRequest = $scope.requests[requestId].request_data;
+        $scope.activeResponseData = $scope.requests[requestId].response_data;
+        $scope.activeResponseCookies = $scope.requests[requestId].response_cookies;
+        $scope.activeResponseHeaders = $scope.requests[requestId].response_headers;
         $scope.activeSaml = $scope.requests[requestId].saml;
         $scope.activeRequestURL = $scope.requests[requestId].request_url;
 
         var lastRequestId = Object.keys($scope.requests)[Object.keys($scope.requests).length - 1];
 
         $scope.showIncomingRequests = requestId == lastRequestId;
+
+        if ($scope.activeSaml == null) {
+            $("#tabs").tabs("option", "active", $("tab-request" + "Selector").index() - 1);
+        }
     };
 
     $scope.getClass = function(requestId) {
@@ -198,7 +239,34 @@ SAMLChrome.controller('PanelController', function PanelController($scope, $http,
         }
     };
 
+    $scope.showTraffic = function() {
+        $scope.showSamlRequests = {};
+        $.each($scope.requests, function(request) {
+            if ($scope.requests[request].saml != null || $scope.showAll === true) {
+                $scope.showSamlRequests[request] = $scope.requests[request];
+            }
+        });
+    }
+
     $scope.createKeypairs = function(data) {
+        var keypairs = [];
+        if (!(data instanceof Object)) {
+            return keypairs;
+        }
+
+        $.each(data, function(key, value) {
+            if (!(value instanceof Object)) {
+                keypairs.push({
+                    name: key,
+                    value: value
+                });
+            }
+        });
+
+        return keypairs;
+    };
+
+    $scope.createKeypairsDeep = function(data) {
         var keypairs = [];
 
         if (!(data instanceof Object)) {
@@ -215,7 +283,18 @@ SAMLChrome.controller('PanelController', function PanelController($scope, $http,
         return keypairs;
     };
 
+
     $scope.$watch('activeSaml', function() {
+        $scope.displaySaml();
+    });
+
+    $scope.isSaml = function(requestId) {
+        if ($scope.requests[requestId].saml != null) {
+            return "SAML";
+        }
+    }
+
+    $scope.displaySaml = function() {
         var options = {
             source: $scope.activeSaml,
             mode: "beautify", //  beautify, diff, minify, parse
@@ -242,6 +321,6 @@ SAMLChrome.controller('PanelController', function PanelController($scope, $http,
             document.getElementById("tab-saml-text-heading").style.visibility = "hidden";
             document.getElementById("tab-saml-text").innerText = "";
         }
-    });
+    }
 
 });

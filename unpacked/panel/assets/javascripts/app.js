@@ -17,20 +17,12 @@ var SAMLChrome = angular.module('SAMLChrome', [])
 				} else if (data === null) {
 					data = '<i>null</i>';
 				} else if (typeof data !== 'number') {
-					try {
-						jason = new PrettyJason(data);
-					} catch(e) {
-						data = $('<div>').text(data).html();
-					}
+					data = $('<div>').text(data).html();
 				}
 
 				var $el = $('<div></div>');
 
-				if (jason) {
-					$el.append(jason);
-				} else {
-					$el.html(data);
-				}
+				$el.html(data);
 
 				element.replaceWith($el);
 			}
