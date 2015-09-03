@@ -1,3 +1,4 @@
+
 function Console() {}
 
 Console.Type = {
@@ -30,6 +31,16 @@ Console.addMessage = function(type, format, args) {
 
 
 SAMLChrome.controller('PanelController', function PanelController($scope, $http, toolbar) {
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://ssl.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-67121118-1', 'auto');
+    ga('set', 'checkProtocolTask', function(){}); // Removes failing protocol check. @see: http://stackoverflow.com/a/22152353/1958200
+    ga('require', 'displayfeatures');
+    ga('send', 'pageview', '/panel.html');
+
     $scope.uniqueid = 1000000;
     $scope.activeId = null;
     $scope.requests = {};
@@ -100,11 +111,11 @@ SAMLChrome.controller('PanelController', function PanelController($scope, $http,
         };
 
         if (har_post_data != null) {
-            if (har_post_data.slice(0, saml_request_string.length) == saml_request_string) {
+            if (har_post_data.indexOf(saml_request_string) > -1) {
                 var decoded_saml_message = $scope.getDecodedSamlMessageFromPostData("Request", request_method, request_url, har_post_data, saml_request_string, response_status, har_entry);
                 Console.log("SAML Request Data: " + decoded_saml_message);
                 found_saml = true;
-            } else if (har_post_data.slice(0, saml_response_string.length) == saml_response_string) {
+            } else if (har_post_data.indexOf(saml_response_string) > -1) {
                 var decoded_saml_message = $scope.getDecodedSamlMessageFromPostData("Response", request_method, request_url, har_post_data, saml_response_string, response_status, har_entry);
                 Console.log("SAML Response Data: " + decoded_saml_message);
                 found_saml = true;
@@ -117,7 +128,8 @@ SAMLChrome.controller('PanelController', function PanelController($scope, $http,
     };
 
     $scope.getDecodedSamlMessageFromPostData = function(request_response_string, request_method, request_url, har_post_data, saml_string, response_status, har_entry) {
-        var saml_message = har_post_data.substr(saml_string.length, har_post_data.length - saml_string.length);
+        var index_of_saml_string = har_post_data.indexOf(saml_string);
+        var saml_message = har_post_data.substr(index_of_saml_string + saml_string.length, har_post_data.length - (index_of_saml_string + saml_string.length));
         var index_of_next_param = saml_message.indexOf("&", 0);
         if (index_of_next_param > -1) {
             saml_message = saml_message.substr(0, index_of_next_param);
@@ -132,12 +144,14 @@ SAMLChrome.controller('PanelController', function PanelController($scope, $http,
 
     $scope.createToolbar = function() {
         toolbar.createButton('tasks', 'Toggle Traffic', function() {
+            ga('send', 'event', 'button', 'click', 'Toggle Traffic');
             $scope.$apply(function() {
                 $scope.showAll = !$scope.showAll;
                 $scope.showTraffic();
             });
         });
         toolbar.createButton('ban', 'Clear', function() {
+            ga('send', 'event', 'button', 'click', 'Clear');
             $scope.$apply(function() {
                 $scope.clear();
             });
@@ -207,6 +221,7 @@ SAMLChrome.controller('PanelController', function PanelController($scope, $http,
         $scope.activeRequestURL = "There are no SAML messages to display";
 
         $scope.showIncomingRequests = true;
+
     };
 
     $scope.setActive = function(requestId) {
