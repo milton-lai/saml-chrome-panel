@@ -55,7 +55,7 @@ SAMLChrome.controller('PanelController', function PanelController($scope, $http,
     $scope.activeResponseCookies = [];
     $scope.activeResponseHeaders = [];
     $scope.activeSaml = null;
-    $scope.activeRequestURL = "There are no SAML messages to display";
+    $scope.activeRequestURL = "There are no SAML messages to display2";
 
     $scope.showIncomingRequests = true;
 
@@ -95,6 +95,9 @@ SAMLChrome.controller('PanelController', function PanelController($scope, $http,
             Console.log("SAML Request Method: " + request_method);
             Console.log("SAML Request URL: " + request_url);
             var index_of_next_param = request_url.indexOf("&", index_of_saml_request_string);
+            if (index_of_next_param < 0) {
+                index_of_next_param = request_url.length;
+            }
 
             //assumes that the GET request is http(s)://host/sso/idp?SAMLRequest=xxxxx&RelayState=yyyy
             var saml_message = request_url.substr(index_of_saml_request_string + saml_request_string.length, index_of_next_param - (index_of_saml_request_string + saml_request_string.length));
