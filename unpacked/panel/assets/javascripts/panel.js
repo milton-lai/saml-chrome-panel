@@ -146,14 +146,30 @@ SAMLChrome.controller('PanelController', function PanelController($scope, $http,
     };
 
     $scope.createToolbar = function() {
-        toolbar.createButton('tasks', 'Toggle Traffic', function() {
+        toolbar.createButton('download', 'Export', false, function() {
+            ga('send', 'event', 'button', 'click', 'Export');
+            $scope.$apply(function() {
+                var blob = new Blob([JSON.stringify($scope.requests)], {type: "application/json;charset=utf-8"});
+                saveAs(blob, "SAMLChromeExport.json");
+            });
+        });
+        toolbar.createButton('upload', 'Import', true, function() {
+            ga('send', 'event', 'button', 'click', 'Import');
+            $scope.$apply(function() {
+               $('#ImportInput').click();
+               //need to import file and then parse it.
+               $scope.showAll = !$scope.showAll;
+                $scope.showTraffic();
+            });
+        });
+        toolbar.createButton('tasks', 'Toggle Traffic', false, function() {
             ga('send', 'event', 'button', 'click', 'Toggle Traffic');
             $scope.$apply(function() {
                 $scope.showAll = !$scope.showAll;
                 $scope.showTraffic();
             });
         });
-        toolbar.createButton('ban', 'Clear', function() {
+        toolbar.createButton('ban', 'Clear', false, function() {
             ga('send', 'event', 'button', 'click', 'Clear');
             $scope.$apply(function() {
                 $scope.clear();

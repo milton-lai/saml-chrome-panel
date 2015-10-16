@@ -359,3 +359,7 @@ th, td {
 #tab-request table {
 	margin-bottom: 24px;
 }
+
+input[type="file"] {
+    display: none;
+}
