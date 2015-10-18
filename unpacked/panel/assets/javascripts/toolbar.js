@@ -24,13 +24,18 @@ return {
             var $button;
 
             if (button.input === true) {
-                $button = $('<a href="#" title="' + button.name + '"><i class="fa fa-' + button.icon + '"></i></a><input id="' + button.name + 'Input" type="file"/>');
+                $button = $('<a href="#" title="' + button.name + '"><i class="fa fa-' + button.icon + '"></i></a>');
             } else {
                 $button = $('<a href="#" title="' + button.name + '"><i class="fa fa-' + button.icon + '"></i></a>');
             }
             $button.on('click', button.callback);
 
             $html.append($button);
+
+            if (button.input === true) {
+                var $inputField = $('<input id="' + button.name + 'Input" type="file"/>');
+                $html.append($inputField);
+            }
         });
 
         return $html;

@@ -81,6 +81,7 @@ SAMLChrome.controller('PanelController', function PanelController($scope, $http,
 
 
     $scope.handleSAMLHeaders = function(har_entry) {
+        Console.log("a");
         var response_headers = har_entry.response.headers;
         var request_headers = har_entry.request.headers;
         var request_method = har_entry.request.method;
@@ -156,10 +157,7 @@ SAMLChrome.controller('PanelController', function PanelController($scope, $http,
         toolbar.createButton('upload', 'Import', true, function() {
             ga('send', 'event', 'button', 'click', 'Import');
             $scope.$apply(function() {
-               $('#ImportInput').click();
-               //need to import file and then parse it.
-               $scope.showAll = !$scope.showAll;
-                $scope.showTraffic();
+                $('#ImportInput').click();
             });
         });
         toolbar.createButton('tasks', 'Toggle Traffic', false, function() {
@@ -177,7 +175,30 @@ SAMLChrome.controller('PanelController', function PanelController($scope, $http,
         });
 
         $('.toolbar').replaceWith(toolbar.render());
+
+        //clears the input value so you can reload the same file
+        document.getElementById('ImportInput').addEventListener('click', function() {this.value=null;}, false);
+        document.getElementById('ImportInput').addEventListener('change', readFile, false);
+        function readFile (evt) {
+            var files = evt.target.files;
+            var file = files[0];
+            var reader = new FileReader();
+            reader.onload = function() {
+                $scope.importFile(this.result);
+            }
+            reader.readAsText(file)
+        }
     };
+
+    $scope.importFile = function(data) {
+        $scope.$apply(function() {
+            var importHar = JSON.parse(data);
+            for (i in importHar)
+            {
+                $scope.handleSAMLHeaders(importHar[i]);
+            }
+        });
+    }
 
     $scope.addRequest = function(data, request_method, request_url, response_status, decoded_saml_message) {
         $scope.$apply(function() {
