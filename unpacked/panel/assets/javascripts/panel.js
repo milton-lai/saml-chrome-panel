@@ -55,7 +55,7 @@ SAMLChrome.controller('PanelController', function PanelController($scope, $http,
     $scope.activeResponseCookies = [];
     $scope.activeResponseHeaders = [];
     $scope.activeSaml = null;
-    $scope.activeRequestURL = "There are no SAML messages to display2";
+    $scope.activeRequestURL = "There are no SAML messages to display";
 
     $scope.showIncomingRequests = true;
 
