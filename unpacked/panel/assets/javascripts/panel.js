@@ -13,7 +13,7 @@ Console.Type = {
 };
 
 Console.addMessage = function(type, format, args) {
-    chrome.extension.sendRequest({
+    chrome.runtime.sendMessage({
         command: "sendToConsole",
         tabId: chrome.devtools.tabId,
         args: escape(JSON.stringify(Array.prototype.slice.call(arguments, 0)))
@@ -81,7 +81,6 @@ SAMLChrome.controller('PanelController', function PanelController($scope, $http,
 
 
     $scope.handleSAMLHeaders = function(har_entry) {
-        Console.log("a");
         var response_headers = har_entry.response.headers;
         var request_headers = har_entry.request.headers;
         var request_method = har_entry.request.method;
@@ -147,6 +146,15 @@ SAMLChrome.controller('PanelController', function PanelController($scope, $http,
     };
 
     $scope.createToolbar = function() {
+        toolbar.createButton('chain', 'Update All Link Targets to _self', false, function() {
+            ga('send', 'event', 'button', 'click', 'Update All Link Targets');
+            $scope.$apply(function() {
+               chrome.runtime.sendMessage({
+                    command: "scrub",
+                    tabId: chrome.devtools.tabId
+                });
+            });
+        });
         toolbar.createButton('download', 'Export', false, function() {
             ga('send', 'event', 'button', 'click', 'Export');
             $scope.$apply(function() {
