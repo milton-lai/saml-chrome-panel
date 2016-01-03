@@ -146,7 +146,7 @@ SAMLChrome.controller('PanelController', function PanelController($scope, $http,
     };
 
     $scope.createToolbar = function() {
-        toolbar.createButton('chain', 'Update All Link Targets to _self', false, function() {
+        toolbar.createButton('chain', 'Update All Link/Form Targets to _self', false, function() {
             ga('send', 'event', 'button', 'click', 'Update All Link Targets');
             $scope.$apply(function() {
                chrome.runtime.sendMessage({
@@ -168,7 +168,7 @@ SAMLChrome.controller('PanelController', function PanelController($scope, $http,
                 $('#ImportInput').click();
             });
         });
-        toolbar.createButton('tasks', 'Toggle Traffic', false, function() {
+        toolbar.createButton('tasks', 'SAML Filter', false, function() {
             ga('send', 'event', 'button', 'click', 'Toggle Traffic');
             $scope.$apply(function() {
                 $scope.showAll = !$scope.showAll;

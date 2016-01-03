@@ -10,7 +10,7 @@ const tab_log = function(json_args) {
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponseParam) {
     if (request.command == 'scrub') {
       chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-        chrome.tabs.sendMessage(tabs[0].id, {greeting: "hello"}, function(response) {
+        chrome.tabs.sendMessage(tabs[0].id, {command: request.command}, function(response) {
           console.log(response);
         });
       });
