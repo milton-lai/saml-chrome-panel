@@ -1,6 +1,6 @@
 {
   "name": "SAML Chrome Panel",
-  "version": "1.8.6",
+  "version": "1.8.7",
   "minimum_chrome_version": "44.0",
   "description": "Extends the Developer Tools, adding support for SAML Requests and Responses to be displayed in the Developer Tools window",
   "devtools_page": "devtools.html",
