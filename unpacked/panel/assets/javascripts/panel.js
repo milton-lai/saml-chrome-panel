@@ -15,7 +15,7 @@ Console.Type = {
 Console.addMessage = function(type, format, args) {
     chrome.runtime.sendMessage({
         command: "sendToConsole",
-        tabId: chrome.devtools.tabId,
+        tabId: chrome.devtools.inspectedWindow.tabId,
         args: escape(JSON.stringify(Array.prototype.slice.call(arguments, 0)))
     });
 };
@@ -163,7 +163,7 @@ SAMLChrome.controller('PanelController', function PanelController($scope, $http,
             $scope.$apply(function() {
                chrome.runtime.sendMessage({
                     command: "scrub",
-                    tabId: chrome.devtools.tabId
+                    tabId: chrome.devtools.inspectedWindow.tabId
                 });
             });
         });
