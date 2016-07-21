@@ -24,3 +24,6 @@ The biggest note is that since the Developer Tools only loads per tab, if you ha
 
 An excellent way to resolve this is with this extension for chrome: https://chrome.google.com/webstore/detail/open-link-in-same-tab/kgpefningcojblgciiljmabggbbjiojb
 It has a right-click contextual option which will open the link in the SAME tab. This helps for the majority of normal links, but I'm not sure how it handles javascript-loaded new windows/tabs.
+
+## Thanks
+Thanks to https://github.com/jasonwzs for contributing to this project.
