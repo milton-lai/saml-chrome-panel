@@ -28,10 +28,8 @@
                 <thead>
                 <tr>
                     <th class='request'>
-                        Path<br>
+                        Path
                     </th>
-                    <th class='method'>Method</th>
-                    <th class='status'>Status</th>
                 </tr>
                 </thead>
             </table>
@@ -39,18 +37,12 @@
                 <table id="requests" resizable-columns data-resizable-columns-sync="#requests-header">
                     <tr class="sizing">
                         <td class='request'></td>
-                        <td class='method'></td>
-                        <td class='status'></td>
                     </tr>
                     <tr ng-repeat="request in showSamlRequests | orderBy:'id'" ng-click="setActive(request.id)" ng-class="getClass(request.id)" scroll-to-new>
-                        <td class='request' title="{{request.request_url}}">{{request.request_url}}<br/><small>{{isSaml(request.id)}}</small></td>
-                        <td class='method' title="{{request.request_method}}">{{request.request_method}}</td>
-                        <td class='status' title="{{request.response_status}}">{{request.response_status}}</td>
+                        <td class='request {{getTrafficStyle(request)}}' title="{{request.request_url}}">{{request.request_url}}</td>
                     </tr>
                     <tr class="filler">
                         <td class='request'></td>
-                        <td class='method'></td>
-                        <td class='status'></td>
                     </tr>
                 </table>
             </div>
@@ -59,18 +51,17 @@
 
     <div class="split-view-contents split-view-contents-details">
         <div id="tabs" class="tabbed-pane">
-            <div><h3>&nbsp;&nbsp;{{activeRequestURL}}</h3></div>
             <div class="tabbed-pane-header">
                 <div class="tabbed-pane-header-contents">
                     <ul class="tabbed-pane-header-tabs">
                         <li class="tabbed-pane-header-tab" ng-show="activeSaml.length">
-                            <a href="#tab-saml" class="tabbed-pane-header-tab-title" ng-click="displaySaml()">SAML</a>
+                            <a href="#tab-saml" class="tabbed-pane-header-tab-title" ng-click="selectDetailTab('tab-saml')">SAML</a>
                         </li>
                         <li class="tabbed-pane-header-tab">
-                            <a href="#tab-request" class="tabbed-pane-header-tab-title">Request</a>
+                            <a href="#tab-request" class="tabbed-pane-header-tab-title" ng-click="selectDetailTab('tab-request')">Request</a>
                         </li>
                         <li class="tabbed-pane-header-tab">
-                            <a href="#tab-response" class="tabbed-pane-header-tab-title">Response</a>
+                            <a href="#tab-response" class="tabbed-pane-header-tab-title" ng-click="selectDetailTab('tab-response')">Response</a>
                         </li>
                     </ul>
                 </div>
@@ -83,10 +74,6 @@
 
                 <div id="tab-saml">
                     <div id="tab-saml-codemirror">
-                    </div>
-                    <h4 id="tab-saml-text-heading" style='visibility:hidden'>&nbsp;&nbsp;Unformatted SAML</h4>
-                    <div id="tab-saml-text">
-                    {{activeSaml}}
                     </div>
                 </div>
 

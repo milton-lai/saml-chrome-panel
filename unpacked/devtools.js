@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 chrome.devtools.panels.create(
-    'SAML Chrome',
+    'SAML',
     'panel/assets/images/SAMLforChromeLogoSquare.png', // No icon path
     'panel/panel.html',
     null // no callback needed

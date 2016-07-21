@@ -6,7 +6,6 @@
 
 body {
 	background: #fff;
-	font-family: 'Lucida Grande', 'Lucida Sans Unicode', sans-serif;
 }
 
 th, td {
@@ -29,6 +28,14 @@ th, td {
 	color: rgb(59, 59, 59);
 }
 
+.toolbar a.selected {
+	color: rgb(62, 130, 240);
+}
+
+.toolbar a.selected:hover {
+	color: rgb(25, 108, 251);
+}
+
 .split-view {
 	bottom: 0;
 	left: 0;
@@ -46,7 +53,7 @@ th, td {
 	top: 0;
 }
 
-@media screen and (max-width: 9	00px) {
+@media screen and (max-width: 900px) {
 	.split-view-contents-requests {
 		bottom: 50%;
 		width: 100%;
@@ -66,7 +73,6 @@ th, td {
 	.split-view-contents-details {
 		left: 480px;
 		right: 0;
-		width: auto;
 	}
 }
 
@@ -90,7 +96,7 @@ th, td {
 .data-grid th {
 	border-bottom: 1px solid rgb(205, 205, 205);
 	border-right: 1px solid rgb(205, 205, 205);
-	height: 30px;
+	height: 25px;
 	padding: 0 4px;
 	white-space: nowrap;
 }
@@ -98,7 +104,7 @@ th, td {
 .data-grid td {
 	border-right: 1px solid rgb(205, 205, 205);
 	overflow: hidden;
-	padding: 8px 4px;
+	padding: 0px 5px;
 	vertical-align: middle;
 	white-space: nowrap;
 }
@@ -116,7 +122,7 @@ th, td {
 	overflow-y: overlay;
 	position: absolute;
 	right: 0;
-	top: 30px;
+	top: 25px;
 }
 
 .data-container table {
@@ -124,7 +130,7 @@ th, td {
 }
 
 .data-container tr {
-	height: 28px;
+	height: 20px;
 }
 
 .data-container tr.sizing {
@@ -255,8 +261,8 @@ th, td {
 
 .tabbed-pane-header {
 	border-bottom: 1px solid rgb(205, 205, 205);
-	padding-left: 25px;
-	padding-top: 7px;
+	padding-left: 0;
+	padding-top: 1px;
 	white-space: nowrap;
 }
 
@@ -280,7 +286,7 @@ th, td {
 	height: 21px;
 	margin-top: 2px;
 	overflow: hidden;
-	padding: 3px 6px 2px 6px;
+	padding: 1px 6px 1px 6px;
 	text-overflow: ellipsis;
 	vertical-align: middle;
 	white-space: nowrap;
@@ -289,7 +295,7 @@ th, td {
 .tabbed-pane-header-tab-title {
 	color: #000;
 	display: block;
-	font-size: 11px;
+	font-size: 12px;
 	min-width: 40px;
 	text-align: center;
 	text-decoration: none;
@@ -317,9 +323,10 @@ th, td {
 }
 
 .data-grid-details table {
-	font-size: 12px;
+	/*font-size: 12px;*/
 	margin-bottom: 6px;
-	table-layout: auto;
+	table-layout: fixed;
+	border: 1px solid rgb(205, 205, 205);
 }
 
 .data-grid-details table tr:nth-child(even) {
@@ -329,8 +336,8 @@ th, td {
 .data-grid-details th {
 	border-bottom: none;
 	border-right: none;
-	font-size: 13px;
-	font-weight: normal;
+	font-size: 12px;
+	font-weight: bold;
 	height: 18px;
 	padding: 0 4px;
 	white-space: nowrap;
@@ -338,10 +345,12 @@ th, td {
 
 .data-grid-details td {
 	border-right: 1px solid #e5e5e5;
+	border-top: 1px solid #e5e5e5;
 	height: auto;
 	line-height: 16px;
 	vertical-align: top;
 	white-space: normal;
+	word-wrap: break-word;
 }
 
 .data-grid-details th:last-child,
@@ -350,14 +359,34 @@ th, td {
 }
 
 .data-grid-details .key {
-	font-size: 12px;
+	/*font-size: 12px;*/
+	font-weight: bold;
 	white-space: nowrap;
 }
 
 /* request details - request */
 
 #tab-request table {
-	margin-bottom: 24px;
+	margin-bottom: 20px;
+}
+
+#tab-response table {
+	margin-bottom: 20px;
+}
+
+#tab-saml {
+	bottom: 0px;
+	left: 0px;
+	overflow-x: hidden;
+	overflow-y: overlay;
+	position: absolute;
+	right: 0px;
+	top: 0px;
+	padding: 10px;
+}
+
+#tab-saml-codemirror {
+	height: 100%;
 }
 
 input[type="file"] {
