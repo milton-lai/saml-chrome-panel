@@ -45,7 +45,9 @@ SAMLChrome.controller('PanelController', function PanelController($scope, $http,
     $scope.activeId = null;
     $scope.requests = {};
     $scope.showSamlRequests = {};
-    $scope.showAll = true;
+    $scope.showAll = false;
+    $scope.showOriginalSAML = false;
+    $scope.currentDetailTab = "tab-saml";
 
     $scope.activeCookies = [];
     $scope.activeHeaders = [];
@@ -55,7 +57,6 @@ SAMLChrome.controller('PanelController', function PanelController($scope, $http,
     $scope.activeResponseCookies = [];
     $scope.activeResponseHeaders = [];
     $scope.activeSaml = null;
-    $scope.activeRequestURL = "There are no SAML messages to display";
 
     $scope.showIncomingRequests = true;
 
@@ -75,6 +76,10 @@ SAMLChrome.controller('PanelController', function PanelController($scope, $http,
         });
 
         chrome.devtools.network.onRequestFinished.addListener(function(request) {
+            // do not show requests to chrome extension resources
+            if (request.request.url.startsWith("chrome-extension://")) {
+                return;
+            }
             $scope.handleSAMLHeaders(request);
         });
     };
@@ -146,6 +151,13 @@ SAMLChrome.controller('PanelController', function PanelController($scope, $http,
     };
 
     $scope.createToolbar = function() {
+        toolbar.createToggleButton('file-text-o', 'SAML Format', false, function() {
+            ga('send', 'event', 'button', 'click', 'Toggle SAML Format');
+            $scope.$apply(function() {
+                $scope.showOriginalSAML = !$scope.showOriginalSAML;
+                $scope.displaySaml();
+            });
+        });
         toolbar.createButton('chain', 'Update All Link/Form Targets to _self', false, function() {
             ga('send', 'event', 'button', 'click', 'Update All Link Targets');
             $scope.$apply(function() {
@@ -168,7 +180,7 @@ SAMLChrome.controller('PanelController', function PanelController($scope, $http,
                 $('#ImportInput').click();
             });
         });
-        toolbar.createButton('tasks', 'SAML Filter', false, function() {
+        toolbar.createToggleButton('tasks', 'SAML Filter', false, function() {
             ga('send', 'event', 'button', 'click', 'Toggle Traffic');
             $scope.$apply(function() {
                 $scope.showAll = !$scope.showAll;
@@ -246,7 +258,7 @@ SAMLChrome.controller('PanelController', function PanelController($scope, $http,
                 $scope.showSamlRequests[requestId] = data;
             }
 
-            if ($scope.showIncomingRequests) {
+            if ($scope.showIncomingRequests && $scope.showSamlRequests[requestId]) {
                 $scope.setActive(requestId);
             }
         });
@@ -256,7 +268,6 @@ SAMLChrome.controller('PanelController', function PanelController($scope, $http,
         $scope.requests = {};
         $scope.activeId = null;
         $scope.showSamlRequests = {};
-        $scope.showAll = true;
 
         $scope.activeCookies = [];
         $scope.activeHeaders = [];
@@ -266,9 +277,9 @@ SAMLChrome.controller('PanelController', function PanelController($scope, $http,
         $scope.activeResponseCookies = [];
         $scope.activeResponseHeaders = [];
         $scope.activeSaml = null;
-        $scope.activeRequestURL = "There are no SAML messages to display";
 
         $scope.showIncomingRequests = true;
+        document.getElementById("tab-saml-codemirror").style.visibility = "hidden";
 
     };
 
@@ -283,13 +294,12 @@ SAMLChrome.controller('PanelController', function PanelController($scope, $http,
         $scope.activeResponseCookies = $scope.requests[requestId].response_cookies;
         $scope.activeResponseHeaders = $scope.requests[requestId].response_headers;
         $scope.activeSaml = $scope.requests[requestId].saml;
-        $scope.activeRequestURL = $scope.requests[requestId].request_url;
 
-        var lastRequestId = Object.keys($scope.requests)[Object.keys($scope.requests).length - 1];
+        var lastRequestId = Object.keys($scope.showSamlRequests)[Object.keys($scope.showSamlRequests).length - 1];
 
         $scope.showIncomingRequests = requestId == lastRequestId;
 
-        if ($scope.activeSaml == null) {
+        if ($scope.activeSaml == null && $scope.currentDetailTab === "tab-saml") {
             $("#tabs").tabs("option", "active", $("tab-request" + "Selector").index() - 1);
         }
     };
@@ -309,6 +319,9 @@ SAMLChrome.controller('PanelController', function PanelController($scope, $http,
                 $scope.showSamlRequests[request] = $scope.requests[request];
             }
         });
+        var lastRequestId = Object.keys($scope.showSamlRequests)[Object.keys($scope.showSamlRequests).length - 1];
+
+        $scope.showIncomingRequests = $scope.activeId == lastRequestId;
     }
 
     $scope.createKeypairs = function(data) {
@@ -352,38 +365,67 @@ SAMLChrome.controller('PanelController', function PanelController($scope, $http,
     });
 
     $scope.isSaml = function(requestId) {
-        if ($scope.requests[requestId].saml != null) {
-            return "SAML";
+    }
+
+    $scope.getTrafficStyle = function(request) {
+        if (request.saml != null) {
+            var status = request.response_status;
+            if (status.startsWith("2")) {
+                return "success";
+            } else if (status.startsWith("3")) {
+                return "redirect";
+            } else {
+                return "error"
+            }
+        }
+        return "";
+    }
+
+    $scope.selectDetailTab = function(tabId) {
+        $scope.currentDetailTab = tabId;
+        if (tabId === "tab-saml") {
+            $scope.displaySaml();
         }
     }
 
     $scope.displaySaml = function() {
+        if ($scope.activeSaml != null) {
+            document.getElementById("tab-saml-codemirror").style.visibility = "visible";
+            
+            var samlContent = $scope.activeSaml;
+            if (!$scope.showOriginalSAML) {
+                samlContent = $scope.getPrettyXML(samlContent);
+            }
+
+            if ($scope.myCodeMirror) {
+                $scope.myCodeMirror.getDoc().setValue(samlContent);
+                return;
+            }
+
+            document.getElementById("tab-saml-codemirror").innerHTML = "";
+            var myCodeMirror = CodeMirror(document.getElementById("tab-saml-codemirror"), {
+              value: samlContent,
+              mode:  "xml",
+              lineNumbers: true,
+              lineWrapping: true
+            });
+            $scope.myCodeMirror = myCodeMirror;
+        }
+    }
+
+    $scope.getPrettyXML = function(source) {
         var options = {
-            source: $scope.activeSaml,
+            source: source,
             mode: "beautify", //  beautify, diff, minify, parse
             lang: "xml",
             wrap: 100,
             inchar: " ", // indent character
-            insize: 3 // number of indent characters per indent
         }
-        if ($scope.activeSaml != null) {
-           var pd = prettydiff(options); // returns and array: [beautified, report]
+        var pd = prettydiff(options); // returns and array: [beautified, report]
 
-            var pretty = pd[0];
-            document.getElementById("tab-saml-codemirror").innerHTML = "";
-            var myCodeMirror = CodeMirror(document.getElementById("tab-saml-codemirror"), {
-              value: pretty,
-              mode:  "xml",
-              lineNumbers: true
-            });
+        var pretty = pd[0];
 
-            document.getElementById("tab-saml-text-heading").style.visibility = "visible";
-            document.getElementById("tab-saml-text").innerText = $scope.activeSaml;
-        } else {
-            document.getElementById("tab-saml-codemirror").innerHTML = "";
-            document.getElementById("tab-saml-text-heading").style.visibility = "hidden";
-            document.getElementById("tab-saml-text").innerText = "";
-        }
+        return pretty;
     }
 
 });
