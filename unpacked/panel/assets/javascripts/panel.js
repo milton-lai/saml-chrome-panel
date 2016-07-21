@@ -365,6 +365,9 @@ SAMLChrome.controller('PanelController', function PanelController($scope, $http,
     });
 
     $scope.isSaml = function(requestId) {
+        if ($scope.requests[requestId].saml != null) {
+            return "saml";
+        }
     }
 
     $scope.getTrafficStyle = function(request) {

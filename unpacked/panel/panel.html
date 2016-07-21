@@ -30,6 +30,12 @@
                     <th class='request'>
                         Path
                     </th>
+                    <th class='method'>
+                        Method
+                    </th>
+                    <th class='status'>
+                        Status
+                    </th>
                 </tr>
                 </thead>
             </table>
@@ -37,12 +43,18 @@
                 <table id="requests" resizable-columns data-resizable-columns-sync="#requests-header">
                     <tr class="sizing">
                         <td class='request'></td>
+                        <td class='method'></td>
+                        <td class='status'></td>
                     </tr>
-                    <tr ng-repeat="request in showSamlRequests | orderBy:'id'" ng-click="setActive(request.id)" ng-class="getClass(request.id)" scroll-to-new>
-                        <td class='request {{getTrafficStyle(request)}}' title="{{request.request_url}}">{{request.request_url}}</td>
+                    <tr class="data" ng-repeat="request in showSamlRequests | orderBy:'id'" ng-click="setActive(request.id)" ng-class="getClass(request.id)" scroll-to-new>
+                        <td class='request {{getTrafficStyle(request)}}' ng-class="{ saml: isSaml(request.id) != saml }" title="{{request.request_url}}">{{request.request_url}}</td>
+                        <td class='method' ng-class="{ saml: isSaml(request.id) != saml }" title="{{request.request_method}}">{{request.request_method}}</td>
+                        <td class='status' ng-class="{ saml: isSaml(request.id) != saml }" title="{{request.response_status}}">{{request.response_status}}</td>
                     </tr>
                     <tr class="filler">
                         <td class='request'></td>
+                        <td class='method'></td>
+                        <td class='status'></td>
                     </tr>
                 </table>
             </div>
