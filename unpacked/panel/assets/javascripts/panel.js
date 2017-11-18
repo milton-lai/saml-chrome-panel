@@ -46,6 +46,7 @@ SAMLChrome.controller('PanelController', function PanelController($scope, $http,
     $scope.requests = {};
     $scope.showSamlRequests = {};
     $scope.showAll = false;
+    $scope.limitNetworkRequests = true;
     $scope.showOriginalSAML = false;
     $scope.currentDetailTab = "tab-saml";
 
@@ -157,7 +158,7 @@ SAMLChrome.controller('PanelController', function PanelController($scope, $http,
                 $scope.showOriginalSAML = !$scope.showOriginalSAML;
                 $scope.displaySaml();
             });
-        });
+        }, false);
         toolbar.createButton('chain', 'Update All Link/Form Targets to _self', false, function() {
             ga('send', 'event', 'button', 'click', 'Update All Link Targets');
             $scope.$apply(function() {
@@ -186,7 +187,13 @@ SAMLChrome.controller('PanelController', function PanelController($scope, $http,
                 $scope.showAll = !$scope.showAll;
                 $scope.showTraffic();
             });
-        });
+        }, false);
+        toolbar.createToggleButton('list', 'Limit network requests to 500', false, function() {
+            ga('send', 'event', 'button', 'click', 'Toggle Limit Network Request');
+            $scope.$apply(function() {
+                $scope.limitNetworkRequests = !$scope.limitNetworkRequests;
+            });
+        }, true);
         toolbar.createButton('ban', 'Clear', false, function() {
             ga('send', 'event', 'button', 'click', 'Clear');
             $scope.$apply(function() {
@@ -258,11 +265,27 @@ SAMLChrome.controller('PanelController', function PanelController($scope, $http,
                 $scope.showSamlRequests[requestId] = data;
             }
 
+            $scope.cleanRequests();
+
             if ($scope.showIncomingRequests && $scope.showSamlRequests[requestId]) {
                 $scope.setActive(requestId);
             }
         });
     };
+
+    $scope.cleanRequests = function() {
+        if ($scope.limitNetworkRequests === true) {
+            var keys = Object.keys($scope.requests).reverse().slice(500);
+            keys.forEach(function(key) {
+                if ($scope.requests[key]) {
+                    delete $scope.requests[key];
+                }
+                if ($scope.showSamlRequests[key]) {
+                    delete $scope.showSamlRequests[key];
+                }
+            });
+        }
+    }
 
     $scope.clear = function() {
         $scope.requests = {};
@@ -284,6 +307,9 @@ SAMLChrome.controller('PanelController', function PanelController($scope, $http,
     };
 
     $scope.setActive = function(requestId) {
+        if (!$scope.requests[requestId]) {
+            return;
+        }
         $scope.activeId = requestId;
 
         $scope.activeCookies = $scope.requests[requestId].cookies;
@@ -430,5 +456,4 @@ SAMLChrome.controller('PanelController', function PanelController($scope, $http,
 
         return pretty;
     }
-
 });

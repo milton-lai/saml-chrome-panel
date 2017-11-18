@@ -15,14 +15,15 @@ return {
         });
     },
 
-    createToggleButton: function(icon, name, input, callback)
+    createToggleButton: function(icon, name, input, callback, selected)
     {
         this.buttons.push({
             icon: icon,
             name: name,
             input: input,
             toggle: true,
-            callback: callback
+            callback: callback,
+            selected: selected
         });
     },
 
@@ -41,6 +42,9 @@ return {
                         $button.addClass("selected");
                     }
                 });
+                if (button.selected === true) {
+                    $button.addClass("selected");
+                }
             }
             $button.on('click', button.callback);
 
