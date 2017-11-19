@@ -50,6 +50,8 @@ SAMLChrome.controller('PanelController', function PanelController($scope, $http,
     $scope.showOriginalSAML = false;
     $scope.currentDetailTab = "tab-saml";
 
+    $scope.myCodeMirror = null;
+
     $scope.activeCookies = [];
     $scope.activeHeaders = [];
     $scope.activePostData = [];
@@ -152,6 +154,14 @@ SAMLChrome.controller('PanelController', function PanelController($scope, $http,
     };
 
     $scope.createToolbar = function() {
+        toolbar.createButton('search', 'Search SAML', false, function() {
+            ga('send', 'event', 'button', 'click', 'Search SAML');
+            $scope.$apply(function() {
+                if ($scope.myCodeMirror) {
+                    $scope.myCodeMirror.execCommand("find");
+                }
+            });
+        });
         toolbar.createToggleButton('file-text-o', 'SAML Format', false, function() {
             ga('send', 'event', 'button', 'click', 'Toggle SAML Format');
             $scope.$apply(function() {
