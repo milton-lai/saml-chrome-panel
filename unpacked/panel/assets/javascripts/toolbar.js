@@ -33,7 +33,7 @@ return {
 
         $.each(this.buttons, function(i, button)
         {
-            var $button = $('<a href="#" title="' + button.name + '"><i class="fa fa-' + button.icon + '"></i></a>');
+            var $button = $('<a class="icon" href="#" title="' + button.name + '"><i class="icon-' + button.icon + '"></i></a>');
             if (button.toggle === true) {
                 $button.on('click', function() {
                     if ($button.hasClass("selected")) {

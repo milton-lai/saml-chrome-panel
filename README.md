@@ -3,7 +3,7 @@ Chrome DevTools Extension Panel for viewing decrypted SAML messages in its own c
 
 ![alt tag](https://raw.githubusercontent.com/milton-lai/saml-chrome-panel/master/SAMLforChromeLogo.png)
 
-This is for Chrome only (tested on OSX 10.12.6 and Chrome 61.0.3163.100)
+This is for Chrome only (tested on OSX 83.0.4103.116 and Chrome 83.0.4103.116)
 
 ## Install
 To install, go to chrome://extensions in your browser, Enable Developer Mode and the click on "Load unpacked Extension..." 
@@ -26,4 +26,4 @@ An excellent way to resolve this is with this extension for chrome: https://chro
 It has a right-click contextual option which will open the link in the SAME tab. This helps for the majority of normal links, but I'm not sure how it handles javascript-loaded new windows/tabs.
 
 ## Thanks
-Thanks to https://github.com/jasonwzs for contributing to this project.
+Thanks to https://github.com/jasonwzs and https://github.com/AlmogBaku for contributing to this project.

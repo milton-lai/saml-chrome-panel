@@ -89,14 +89,15 @@ SAMLChrome.controller('PanelController', function PanelController($scope, $http,
 
 
     $scope.handleSAMLHeaders = function(har_entry) {
-        var response_headers = har_entry.response.headers;
-        var request_headers = har_entry.request.headers;
-        var request_method = har_entry.request.method;
-        var request_url = har_entry.request.url;
-        var response_status = har_entry.response.status;
-        var saml_request_string = "SAMLRequest=";
-        var saml_response_string = "SAMLResponse=";
-        var found_saml = false;
+        let decoded_saml_message;
+        const response_headers = har_entry.response.headers;
+        const request_headers = har_entry.request.headers;
+        const request_method = har_entry.request.method;
+        const request_url = har_entry.request.url;
+        const response_status = har_entry.response.status;
+        const saml_request_string = "SAMLRequest=";
+        const saml_response_string = "SAMLResponse=";
+        let found_saml = false;
 
         var index_of_saml_request_string = request_url.indexOf(saml_request_string);
         if (index_of_saml_request_string > -1) {
@@ -108,26 +109,26 @@ SAMLChrome.controller('PanelController', function PanelController($scope, $http,
             }
 
             //assumes that the GET request is http(s)://host/sso/idp?SAMLRequest=xxxxx&RelayState=yyyy
-            var saml_message = request_url.substr(index_of_saml_request_string + saml_request_string.length, index_of_next_param - (index_of_saml_request_string + saml_request_string.length));
+            const saml_message = request_url.substr(index_of_saml_request_string + saml_request_string.length, index_of_next_param - (index_of_saml_request_string + saml_request_string.length));
             //requires inflating
-            var decoded_saml_message = RawDeflate.inflate(window.atob(unescape(saml_message)));
+            decoded_saml_message = RawDeflate.inflate(window.atob(unescape(saml_message)));
             $scope.addRequest(har_entry, request_method, request_url, response_status, decoded_saml_message);
             Console.log("SAML Request Data: " + decoded_saml_message);
             found_saml = true;
         }
 
-        var har_post_data = null;
+        let har_post_data = null;
         if (har_entry.request != null && har_entry.request.postData != null) {
             har_post_data = har_entry.request.postData.text;
         };
 
         if (har_post_data != null) {
             if (har_post_data.indexOf(saml_request_string) > -1) {
-                var decoded_saml_message = $scope.getDecodedSamlMessageFromPostData("Request", request_method, request_url, har_post_data, saml_request_string, response_status, har_entry);
+                decoded_saml_message = $scope.getDecodedSamlMessageFromPostData("Request", request_method, request_url, har_post_data, saml_request_string, response_status, har_entry);
                 Console.log("SAML Request Data: " + decoded_saml_message);
                 found_saml = true;
             } else if (har_post_data.indexOf(saml_response_string) > -1) {
-                var decoded_saml_message = $scope.getDecodedSamlMessageFromPostData("Response", request_method, request_url, har_post_data, saml_response_string, response_status, har_entry);
+                decoded_saml_message = $scope.getDecodedSamlMessageFromPostData("Response", request_method, request_url, har_post_data, saml_response_string, response_status, har_entry);
                 Console.log("SAML Response Data: " + decoded_saml_message);
                 found_saml = true;
             }
@@ -139,15 +140,15 @@ SAMLChrome.controller('PanelController', function PanelController($scope, $http,
     };
 
     $scope.getDecodedSamlMessageFromPostData = function(request_response_string, request_method, request_url, har_post_data, saml_string, response_status, har_entry) {
-        var index_of_saml_string = har_post_data.indexOf(saml_string);
-        var saml_message = har_post_data.substr(index_of_saml_string + saml_string.length, har_post_data.length - (index_of_saml_string + saml_string.length));
-        var index_of_next_param = saml_message.indexOf("&", 0);
+        const index_of_saml_string = har_post_data.indexOf(saml_string);
+        let saml_message = har_post_data.substr(index_of_saml_string + saml_string.length, har_post_data.length - (index_of_saml_string + saml_string.length));
+        const index_of_next_param = saml_message.indexOf("&", 0);
         if (index_of_next_param > -1) {
             saml_message = saml_message.substr(0, index_of_next_param);
         }
 
         //using the window.atob base64 decoding method as it seems to work pretty well
-        var decoded_saml_message = window.atob(unescape(saml_message));
+        const decoded_saml_message = window.atob(unescape(saml_message));
         $scope.addRequest(har_entry, request_method, request_url, response_status, decoded_saml_message);
 
         return decoded_saml_message;
@@ -217,9 +218,9 @@ SAMLChrome.controller('PanelController', function PanelController($scope, $http,
         document.getElementById('ImportInput').addEventListener('click', function() {this.value=null;}, false);
         document.getElementById('ImportInput').addEventListener('change', readFile, false);
         function readFile (evt) {
-            var files = evt.target.files;
-            var file = files[0];
-            var reader = new FileReader();
+            const files = evt.target.files;
+            const file = files[0];
+            const reader = new FileReader();
             reader.onload = function() {
                 $scope.importFile(this.result);
             }
@@ -229,7 +230,7 @@ SAMLChrome.controller('PanelController', function PanelController($scope, $http,
 
     $scope.importFile = function(data) {
         $scope.$apply(function() {
-            var importHar = JSON.parse(data);
+            const importHar = JSON.parse(data);
             for (i in importHar)
             {
                 $scope.handleSAMLHeaders(importHar[i]);
@@ -239,7 +240,7 @@ SAMLChrome.controller('PanelController', function PanelController($scope, $http,
 
     $scope.addRequest = function(data, request_method, request_url, response_status, decoded_saml_message) {
         $scope.$apply(function() {
-            var requestId = $scope.uniqueid;
+            const requestId = $scope.uniqueid;
             $scope.uniqueid = $scope.uniqueid + 1;
 
             if (data.request != null) {
@@ -285,7 +286,7 @@ SAMLChrome.controller('PanelController', function PanelController($scope, $http,
 
     $scope.cleanRequests = function() {
         if ($scope.limitNetworkRequests === true) {
-            var keys = Object.keys($scope.requests).reverse().slice(500);
+            const keys = Object.keys($scope.requests).reverse().slice(500);
             keys.forEach(function(key) {
                 if ($scope.requests[key]) {
                     delete $scope.requests[key];
@@ -331,7 +332,7 @@ SAMLChrome.controller('PanelController', function PanelController($scope, $http,
         $scope.activeResponseHeaders = $scope.requests[requestId].response_headers;
         $scope.activeSaml = $scope.requests[requestId].saml;
 
-        var lastRequestId = Object.keys($scope.showSamlRequests)[Object.keys($scope.showSamlRequests).length - 1];
+        const lastRequestId = Object.keys($scope.showSamlRequests)[Object.keys($scope.showSamlRequests).length - 1];
 
         $scope.showIncomingRequests = requestId == lastRequestId;
 
@@ -341,7 +342,7 @@ SAMLChrome.controller('PanelController', function PanelController($scope, $http,
     };
 
     $scope.getClass = function(requestId) {
-        if (requestId == $scope.activeId) {
+        if (requestId === $scope.activeId) {
             return 'selected';
         } else {
             return '';
@@ -361,7 +362,7 @@ SAMLChrome.controller('PanelController', function PanelController($scope, $http,
     }
 
     $scope.createKeypairs = function(data) {
-        var keypairs = [];
+        let keypairs = [];
         if (!(data instanceof Object)) {
             return keypairs;
         }
@@ -379,7 +380,7 @@ SAMLChrome.controller('PanelController', function PanelController($scope, $http,
     };
 
     $scope.createKeypairsDeep = function(data) {
-        var keypairs = [];
+        let keypairs = [];
 
         if (!(data instanceof Object)) {
             return keypairs;
@@ -408,10 +409,10 @@ SAMLChrome.controller('PanelController', function PanelController($scope, $http,
 
     $scope.getTrafficStyle = function(request) {
         if (request.saml != null) {
-            var status = request.response_status;
-            if (status.startsWith("2")) {
+            const status = request.response_status;
+            if (status >= 200 && status < 300) {
                 return "success";
-            } else if (status.startsWith("3")) {
+            } else if (status >= 300 && status < 400) {
                 return "redirect";
             } else {
                 return "error"
@@ -430,8 +431,8 @@ SAMLChrome.controller('PanelController', function PanelController($scope, $http,
     $scope.displaySaml = function() {
         if ($scope.activeSaml != null) {
             document.getElementById("tab-saml-codemirror").style.visibility = "visible";
-            
-            var samlContent = $scope.activeSaml;
+
+            let samlContent = $scope.activeSaml;
             if (!$scope.showOriginalSAML) {
                 samlContent = $scope.getPrettyXML(samlContent);
             }
@@ -442,27 +443,27 @@ SAMLChrome.controller('PanelController', function PanelController($scope, $http,
             }
 
             document.getElementById("tab-saml-codemirror").innerHTML = "";
-            var myCodeMirror = CodeMirror(document.getElementById("tab-saml-codemirror"), {
-              value: samlContent,
-              mode:  "xml",
-              lineNumbers: true,
-              lineWrapping: true
+            const myCodeMirror = CodeMirror(document.getElementById("tab-saml-codemirror"), {
+                value: samlContent,
+                mode: "xml",
+                lineNumbers: true,
+                lineWrapping: true
             });
             $scope.myCodeMirror = myCodeMirror;
         }
     }
 
     $scope.getPrettyXML = function(source) {
-        var options = {
+        const options = {
             source: source,
             mode: "beautify", //  beautify, diff, minify, parse
             lang: "xml",
             wrap: 100,
             inchar: " ", // indent character
-        }
-        var pd = prettydiff(options); // returns and array: [beautified, report]
+        };
+        const pd = prettydiff(options); // returns and array: [beautified, report]
 
-        var pretty = pd[0];
+        const pretty = pd[0];
 
         return pretty;
     }

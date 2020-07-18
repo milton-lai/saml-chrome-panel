@@ -6,8 +6,7 @@ var SAMLChrome = angular.module('SAMLChrome', [])
 			transclude: false,
 			scope: { data: '=data' },
 			link: function (scope, element, attrs) {
-				var data = scope.data;
-				var jason;
+				let data = scope.data;
 				if (data === true) {
 					data = '<i>true</i>';
 				} else if (data === false) {
@@ -20,7 +19,7 @@ var SAMLChrome = angular.module('SAMLChrome', [])
 					data = $('<div>').text(data).html();
 				}
 
-				var $el = $('<div></div>');
+				let $el = $('<div></div>');
 
 				$el.html(data);
 
@@ -31,7 +30,7 @@ var SAMLChrome = angular.module('SAMLChrome', [])
 	.directive('resizableColumns', function ($parse) {
 		return {
 			link: function (scope, element, attrs) {
-				var options = { minWidth: 5 };
+				const options = {minWidth: 5};
 
 				if ($(element).data('resizable-columns-sync')) {
 					var $target = $($(element).data('resizable-columns-sync'));
@@ -57,8 +56,8 @@ var SAMLChrome = angular.module('SAMLChrome', [])
 	.directive('scrollToNew', function ($parse) {
 		return function(scope, element, attrs) {
 			if (scope.showIncomingRequests && scope.$last) {
-				var $container = $(element).parents('.data-container').first();
-				var $parent = $(element).parent();
+				const $container = $(element).parents('.data-container').first();
+				const $parent = $(element).parent();
 
 				$container.scrollTop($parent.height());
 			}

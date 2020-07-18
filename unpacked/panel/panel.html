@@ -1,21 +1,19 @@
 <html ng-app="SAMLChrome" ng-csp="">
 <head>
     <link rel="stylesheet" type="text/css" href="vendor/assets/stylesheets/jquery.resizableColumns.css">
-    <link rel="stylesheet" type="text/css" href="vendor/assets/stylesheets/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="vendor/assets/stylesheets/style.css">
     <link rel="stylesheet" type="text/css" href="vendor/assets/stylesheets/codemirror.min.css">
     <link rel="stylesheet" type="text/css" href="vendor/assets/stylesheets/codemirror-dialog.min.css">
     <link rel="stylesheet" type="text/css" href="vendor/assets/stylesheets/codemirror-matchesonscrollbar.min.css">
     <link rel="stylesheet" type="text/css" href="assets/stylesheets/panel.css">
-    <script src="vendor/assets/javascripts/jquery-2.0.2.min.js"></script>
+    <script src="vendor/assets/javascripts/jquery-2.2.4.min.js"></script>
     <script src="vendor/assets/javascripts/jquery-ui-1.10.3.custom.min.js"></script>
-    <script src="vendor/assets/javascripts/sugar-1.3.9.min.js"></script>
-    <script src="vendor/assets/javascripts/URI.min.js"></script>
     <script src="vendor/assets/javascripts/keymaster.min.js"></script>
     <script src="vendor/assets/javascripts/angular.min.js"></script>
     <script src="vendor/assets/javascripts/jquery.resizableColumns.min.js"></script>
     <script src="vendor/assets/javascripts/prettydiff.min.js"></script>
     <script src="vendor/assets/javascripts/rawinflate.js"></script>
-    <script src="vendor/assets/javascripts/codemirror-compressed.js"></script>
+    <script src="vendor/assets/javascripts/codemirror.min.js"></script>
     <script src="vendor/assets/javascripts/codemirror-xml.min.js"></script>
     <script src="vendor/assets/javascripts/codemirror-dialog.min.js"></script>
     <script src="vendor/assets/javascripts/codemirror-search.min.js"></script>
@@ -26,7 +24,6 @@
     <script src="assets/javascripts/app.js"></script>
     <script src="assets/javascripts/panel.js"></script>
     <script src="assets/javascripts/toolbar.js"></script>
-
 </head>
 <body>
 <div class="split-view" ng-controller='PanelController' ng-init="init('chrome-extension')">

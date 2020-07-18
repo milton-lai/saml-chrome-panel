@@ -22,18 +22,22 @@ th, td {
 	cursor: default;
 	font-size: 15px;
 	padding: 0 5px;
+	text-decoration: none;
 }
 
 .toolbar a:hover {
 	color: rgb(59, 59, 59);
+	text-decoration: none;
 }
 
 .toolbar a.selected {
 	color: rgb(62, 130, 240);
+	text-decoration: none;
 }
 
 .toolbar a.selected:hover {
 	color: rgb(25, 108, 251);
+	text-decoration: none;
 }
 
 .split-view {
@@ -398,3 +402,6 @@ input[type="file"] {
     display: none;
 }
 
+.CodeMirror {
+	height: 100% !important;
+}
