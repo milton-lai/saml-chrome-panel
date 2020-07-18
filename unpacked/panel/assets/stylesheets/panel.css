@@ -386,7 +386,8 @@ th, td {
 	position: absolute;
 	right: 0px;
 	top: 0px;
-	padding: 10px;
+	padding: 1px;
+	font-size: 12px;
 }
 
 #tab-saml-codemirror {
