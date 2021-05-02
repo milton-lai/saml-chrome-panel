@@ -1,14 +1,14 @@
-console.log("background.js loaded");
+console.debug("background.js loaded");
 const tab_log = function(json_args) {
   var args = JSON.parse(unescape(json_args));
   console[args[0]].apply(console, Array.prototype.slice.call(args, 1));
 }
 
 function onMessageRequest(message, sender, sendResponse) {
-    console.log("background.js received request");
+    console.debug("background.js received request");
     if (message.command === 'scrub') {
-        console.log("background.js sending scrub message to chrome.tabs");
-        console.log("background.js using tabId: " + message.tabId);
+        console.debug("background.js sending scrub message to chrome.tabs");
+        console.debug("background.js using tabId: " + message.tabId);
         chrome.tabs.sendMessage(message.tabId, {command: message.command}, function(response) {
             sendResponse("success");
         });
