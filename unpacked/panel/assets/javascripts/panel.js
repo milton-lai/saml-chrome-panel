@@ -454,17 +454,10 @@ SAMLChrome.controller('PanelController', function PanelController($scope, $http,
     }
 
     $scope.getPrettyXML = function(source) {
-        const options = {
-            source: source,
-            mode: "beautify", //  beautify, diff, minify, parse
-            lang: "xml",
-            wrap: 100,
-            inchar: " ", // indent character
-        };
-        const pd = prettydiff(options); // returns and array: [beautified, report]
-
-        const pretty = pd[0];
-
-        return pretty;
+        return new XmlBeautify().beautify(source,
+            {
+                indent: " ",  //indent pattern like white spaces
+                useSelfClosingElement: false //true:use self-closing element when empty element.
+        });
     }
 });
