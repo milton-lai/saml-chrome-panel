@@ -1,6 +1,6 @@
 {
   "name": "SAML Chrome Panel",
-  "version": "1.9.3",
+  "version": "1.9.4",
   "minimum_chrome_version": "44.0",
   "description": "Extends the Developer Tools, adding support for SAML Requests and Responses to be displayed in the Developer Tools window",
   "devtools_page": "devtools.html",
@@ -8,7 +8,6 @@
   "background": { "scripts": ["background.js"] },
   "permissions": [
     "<all_urls>",
-    "tabs",
     "activeTab"
   ],
   "manifest_version": 2,
