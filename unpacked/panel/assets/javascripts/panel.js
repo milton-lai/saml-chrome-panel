@@ -31,16 +31,6 @@ Console.addMessage = function(type, format, args) {
 
 
 SAMLChrome.controller('PanelController', function PanelController($scope, $http, toolbar) {
-    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-    })(window,document,'script','https://ssl.google-analytics.com/analytics.js','ga');
-
-    ga('create', 'UA-67121118-1', 'auto');
-    ga('set', 'checkProtocolTask', function(){}); // Removes failing protocol check. @see: http://stackoverflow.com/a/22152353/1958200
-    ga('require', 'displayfeatures');
-    ga('send', 'pageview', '/panel.html');
-
     $scope.uniqueid = 1000000;
     $scope.activeId = null;
     $scope.requests = {};
@@ -90,8 +80,6 @@ SAMLChrome.controller('PanelController', function PanelController($scope, $http,
 
     $scope.handleSAMLHeaders = function(har_entry) {
         let decoded_saml_message;
-        const response_headers = har_entry.response.headers;
-        const request_headers = har_entry.request.headers;
         const request_method = har_entry.request.method;
         const request_url = har_entry.request.url;
         const response_status = har_entry.response.status;
@@ -156,7 +144,6 @@ SAMLChrome.controller('PanelController', function PanelController($scope, $http,
 
     $scope.createToolbar = function() {
         toolbar.createButton('search', 'Search SAML', false, function() {
-            ga('send', 'event', 'button', 'click', 'Search SAML');
             $scope.$apply(function() {
                 if ($scope.myCodeMirror) {
                     $scope.myCodeMirror.execCommand("find");
@@ -164,14 +151,12 @@ SAMLChrome.controller('PanelController', function PanelController($scope, $http,
             });
         });
         toolbar.createToggleButton('file-text-o', 'SAML Format', false, function() {
-            ga('send', 'event', 'button', 'click', 'Toggle SAML Format');
             $scope.$apply(function() {
                 $scope.showOriginalSAML = !$scope.showOriginalSAML;
                 $scope.displaySaml();
             });
         }, false);
         toolbar.createButton('chain', 'Update All Link/Form Targets to _self', false, function() {
-            ga('send', 'event', 'button', 'click', 'Update All Link Targets');
             $scope.$apply(function() {
                chrome.runtime.sendMessage({
                     command: "scrub",
@@ -180,33 +165,28 @@ SAMLChrome.controller('PanelController', function PanelController($scope, $http,
             });
         });
         toolbar.createButton('download', 'Export', false, function() {
-            ga('send', 'event', 'button', 'click', 'Export');
             $scope.$apply(function() {
                 var blob = new Blob([JSON.stringify($scope.requests)], {type: "application/json;charset=utf-8"});
                 saveAs(blob, "SAMLChromeExport.json");
             });
         });
         toolbar.createButton('upload', 'Import', true, function() {
-            ga('send', 'event', 'button', 'click', 'Import');
             $scope.$apply(function() {
                 $('#ImportInput').click();
             });
         });
         toolbar.createToggleButton('tasks', 'SAML Filter', false, function() {
-            ga('send', 'event', 'button', 'click', 'Toggle Traffic');
             $scope.$apply(function() {
                 $scope.showAll = !$scope.showAll;
                 $scope.showTraffic();
             });
         }, false);
         toolbar.createToggleButton('list', 'Limit network requests to 500', false, function() {
-            ga('send', 'event', 'button', 'click', 'Toggle Limit Network Request');
             $scope.$apply(function() {
                 $scope.limitNetworkRequests = !$scope.limitNetworkRequests;
             });
         }, true);
         toolbar.createButton('ban', 'Clear', false, function() {
-            ga('send', 'event', 'button', 'click', 'Clear');
             $scope.$apply(function() {
                 $scope.clear();
             });

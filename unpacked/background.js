@@ -13,8 +13,10 @@ function onMessageRequest(message, sender, sendResponse) {
             sendResponse("success");
         });
     } else if (message.command === 'sendToConsole') {
-        chrome.tabs.executeScript(message.tabId, {
-            code: "("+ tab_log + ")('" + message.args + "');",
+        chrome.scripting.executeScript({
+            target: {tabId: message.tabId},
+            func: tab_log,
+            args: [message.args],
         });
         sendResponse("success");
     }
